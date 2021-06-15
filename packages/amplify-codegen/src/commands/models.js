@@ -71,13 +71,7 @@ async function generateModels(context) {
 
   const generateIndexRules = readFeatureFlag('codegen.generateIndexRules');
   const emitAuthProvider = readFeatureFlag('codegen.emitAuthProvider');
-
-  let handleListNullabilityTransparently = false;
-  try {
-    handleListNullabilityTransparently = FeatureFlags.getBoolean('handleListNullabilityTransparently');
-  } catch (err) {
-    handleListNullabilityTransparently = false;
-  }
+  const handleListNullabilityTransparently = readFeatureFlag('codegen.handleListNullabilityTransparently');
 
   const appsyncLocalConfig = await appSyncDataStoreCodeGen.preset.buildGeneratesSection({
     baseOutputDir: outputPath,
