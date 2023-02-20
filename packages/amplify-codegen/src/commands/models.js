@@ -110,25 +110,60 @@ Amplify Flutter versions prior to 0.6.0 are no longer supported by codegen. Plea
   const generateModelsForLazyLoadAndCustomSelectionSet = readFeatureFlag('codegen.generateModelsForLazyLoadAndCustomSelectionSet');
 
   let isTimestampFieldsAdded = readFeatureFlag('codegen.addTimestampFields');
+  let enableDartNullSafety = readFeatureFlag('codegen.enableDartNullSafety');
+  let enableDartZeroThreeFeatures = false;
+  let dartUpdateAmplifyCoreDependency = false;
 
   const handleListNullabilityTransparently = readFeatureFlag('codegen.handleListNullabilityTransparently');
+  const config = {
+    target: isIntrospection ? 'introspection' : platformToLanguageMap[projectConfig.frontend] || projectConfig.frontend,
+    directives: directiveDefinitions,
+    isTimestampFieldsAdded,
+    emitAuthProvider,
+    generateIndexRules,
+    enableDartNullSafety,
+    handleListNullabilityTransparently,
+    usePipelinedTransformer,
+    enableDartZeroThreeFeatures,
+    transformerVersion,
+    dartUpdateAmplifyCoreDependency,
+    respectPrimaryKeyAttributesOnConnectionField,
+    generateModelsForLazyLoadAndCustomSelectionSet,
+    codegenVersion: packageVersion,
+    overrideOutputDir, // This needs to live under `config` in order for the GraphQL types to work out.
+  };
+
+  if (projectConfig.frontend === 'flutter') {
+    const isMinimumDartVersionSatisfied = validateDartSDK(context, projectRoot);
+    context.print.warning(`Detected feature flag: “enableDartNullSafety : ${enableDartNullSafety}”`);
+    if (isMinimumDartVersionSatisfied && enableDartNullSafety) {
+      context.print.warning(
+        'Generating Dart Models with null safety. To opt out of null safe models, turn off the “enableDartNullSafety” feature flag. Learn more: https://docs.amplify.aws/lib/project-setup/null-safety/q/platform/flutter',
+      );
+    } else {
+      enableDartNullSafety = false;
+      context.print.warning(
+        'Generating Dart Models without null safety. To generate null safe data models, turn on the “enableDartNullSafety” feature flag and set your Dart SDK version to “>= 2.12.0”. Learn more: https://docs.amplify.aws/lib/project-setup/null-safety/q/platform/flutter',
+      );
+    }
+    // override isTimestampFieldsAdded to true when using amplify-flutter > 0.3.0 || > 0.3.0-rc.2
+    isTimestampFieldsAdded = validateAmplifyFlutterCapableZeroThreeFeatures(projectRoot);
+    enableDartZeroThreeFeatures = validateAmplifyFlutterCapableZeroThreeFeatures(projectRoot);
+    // This feature is supported only for users using amplify-flutter > 0.4.0 || > 0.4.0-rc.1
+    dartUpdateAmplifyCoreDependency = validateAmplifyFlutterCoreLibraryDependency(projectRoot);
+
+    const visitor = new appSyncDataStoreCodeGen.AppSyncModelDartVisitor(schema, {
+      ...config,
+      projectRoot: projectRoot,
+    });
+    await visitor.generateAsync();
+    return [];
+  }
+
   const appsyncLocalConfig = await appSyncDataStoreCodeGen.preset.buildGeneratesSection({
     baseOutputDir,
     schema,
-    config: {
-      target: isIntrospection ? 'introspection' : platformToLanguageMap[projectConfig.frontend] || projectConfig.frontend,
-      directives: directiveDefinitions,
-      isTimestampFieldsAdded,
-      emitAuthProvider,
-      generateIndexRules,
-      handleListNullabilityTransparently,
-      usePipelinedTransformer,
-      transformerVersion,
-      respectPrimaryKeyAttributesOnConnectionField,
-      generateModelsForLazyLoadAndCustomSelectionSet,
-      codegenVersion: packageVersion,
-      overrideOutputDir, // This needs to live under `config` in order for the GraphQL types to work out.
-    },
+    config,
   });
 
   const codeGenPromises = appsyncLocalConfig.map(cfg => {

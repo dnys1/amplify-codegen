@@ -26,6 +26,7 @@
     "extract-api": "ts-node ../../scripts/extract-api.ts"
   },
   "dependencies": {
+    "@aws-amplify/appsync-modelgen-core": "0.0.1",
     "@graphql-codegen/plugin-helpers": "^1.18.8",
     "@graphql-codegen/visitor-plugin-common": "^1.22.0",
     "@graphql-tools/utils": "^6.0.18",

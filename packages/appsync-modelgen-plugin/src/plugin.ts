@@ -7,8 +7,9 @@ import { AppSyncJSONVisitor } from './visitors/appsync-json-metadata-visitor';
 import { AppSyncModelJavaVisitor } from './visitors/appsync-java-visitor';
 import { AppSyncModelTypeScriptVisitor } from './visitors/appsync-typescript-visitor';
 import { AppSyncModelJavascriptVisitor } from './visitors/appsync-javascript-visitor';
-import { AppSyncModelDartVisitor } from './visitors/appsync-dart-visitor';
 import { AppSyncModelIntrospectionVisitor } from './visitors/appsync-model-introspection-visitor';
+
+export { AppSyncModelDartVisitor } from './visitors/appsync-dart-visitor';
 export const plugin: PluginFunction<RawAppSyncModelConfig> = (
   schema: GraphQLSchema,
   rawDocuments: Types.DocumentFile[],
@@ -38,11 +39,7 @@ export const plugin: PluginFunction<RawAppSyncModelConfig> = (
       visitor = new AppSyncModelJavascriptVisitor(schema, config, {});
       break;
     case 'dart':
-      visitor = new AppSyncModelDartVisitor(schema, config, {
-        selectedType: config.selectedType,
-        generate: config.generate,
-      });
-      break;
+      throw new Error('Dart is no longer supported in this codepath.');
     case 'introspection':
       visitor = new AppSyncModelIntrospectionVisitor(schema, config, {});
       break;

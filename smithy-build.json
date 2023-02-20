@@ -1,0 +1,6 @@
+{
+    "mavenDependencies": [
+        "software.amazon.smithy:smithy-model:1.27.2",
+        "software.amazon.smithy:smithy-aws-traits:1.27.2"
+    ]
+}

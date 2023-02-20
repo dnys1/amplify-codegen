@@ -1,0 +1,20 @@
+{
+    "version": "1.0",
+    "plugins": {
+        "typescript-codegen": {
+            "service": "com.amazonaws.amplify.codegen#CodegenPluginService",
+            "targetNamespace": "CodegenPlugin",
+            "package": "@aws-amplify/appsync-modelgen-core",
+            "packageVersion": "0.0.1",
+            "packageJson": {
+                "license": "Apache-2.0",
+                "repository": {
+                  "type": "git",
+                  "url": "https://github.com/aws-amplify/amplify-codegen.git",
+                  "directory": "packages/appsync-modelgen-core"
+                }
+            },
+            "private": true
+        }
+    }
+}
